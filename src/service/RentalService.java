@@ -3,17 +3,20 @@ package service;
 import model.Car;
 import model.Customer;
 import model.Rental;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class RentalService {
-    private List<Rental> rentals = new ArrayList<>();
+    private final List<Rental> rentals = new ArrayList<>();
 
     public void rentCar(Car car, Customer customer) {
         if (car.isAvailable()) {
             car.setAvailable(false);
-            rentals.add(new Rental(car, customer));
+            Rental rental = new Rental(car, customer);
+            rentals.add(rental);
             System.out.println("Rental successful!");
+            System.out.println(rental);
         } else {
             System.out.println("Car is not available.");
         }
@@ -26,5 +29,15 @@ public class RentalService {
 
     public List<Rental> getAllRentals() {
         return rentals;
+    }
+
+    public void printAllRentalRecords() {
+        if (rentals.isEmpty()) {
+            System.out.println("No rentals found.");
+        } else {
+            for (Rental rental : rentals) {
+                System.out.println(rental);
+            }
+        }
     }
 }

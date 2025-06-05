@@ -5,11 +5,13 @@ public class Car {
     private String brand;
     private String model;
     private boolean isAvailable;
+    private double pricePerDay;
 
-    public Car(int id, String brand, String model) {
+    public Car(int id, String brand, String model, double pricePerDay) {
         this.id = id;
         this.brand = brand;
         this.model = model;
+        this.pricePerDay = pricePerDay;
         this.isAvailable = true;
     }
 
@@ -33,8 +35,17 @@ public class Car {
         this.isAvailable = available;
     }
 
+    public double getPricePerDay() {
+        return pricePerDay;
+    }
+
+    public void setPricePerDay(double pricePerDay) {
+        this.pricePerDay = pricePerDay;
+    }
+
     @Override
     public String toString() {
-        return "ID" + id + " - " + brand + " " + model + " | " + (isAvailable ? "Available" : "Rented");
+        return "ID" + id + " - " + brand + " " + model + " | Price/Day: $" + pricePerDay + " | " +
+                (isAvailable ? "Available" : "Rented");
     }
 }

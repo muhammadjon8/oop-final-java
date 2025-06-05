@@ -14,6 +14,7 @@ public class Main {
         RentalService rentalService = new RentalService();
 
         int carId = 1, customerId = 1;
+
         while (true) {
             System.out.println("\n==== Rent-Car Management ====");
             System.out.println("1. Add Car");
@@ -25,8 +26,13 @@ public class Main {
             System.out.println("0. Exit");
             System.out.print("Choose option: ");
 
-            int option = scanner.nextInt();
-            scanner.nextLine();  // consume newline
+            int option;
+            try {
+                option = Integer.parseInt(scanner.nextLine());
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a number.");
+                continue;
+            }
 
             switch (option) {
                 case 1:
@@ -34,60 +40,75 @@ public class Main {
                     String brand = scanner.nextLine();
                     System.out.print("Enter model: ");
                     String model = scanner.nextLine();
-                    carService.addCar(new Car(carId++, brand, model));
-                    System.out.println("Car added successfully.");
+                    System.out.print("Enter price per day: ");
+                    double price;
+                    try {
+                        price = Double.parseDouble(scanner.nextLine());
+                    } catch (Exception e) {
+                        System.out.println("Invalid price. Car not added.");
+                        break;
+                    }
+
+                    carService.addCar(new Car(carId++, brand, model, price));
+                    System.out.println("✅ Car added successfully.");
                     break;
 
                 case 2:
                     System.out.print("Enter customer name: ");
                     String name = scanner.nextLine();
-                    customerService.addCustomer(new Customer(customerId++, name));
-                    System.out.println("Customer added successfully.");
+                    try {
+                        customerService.addCustomer(new Customer(customerId++, name));
+                        System.out.println("✅ Customer added successfully.");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("❌ " + e.getMessage());
+                        customerId--; // rollback ID if failed
+                    }
                     break;
 
                 case 3:
-                    System.out.println("Available Cars:");
-                    for (Car car : carService.getAvailableCars()) {
-                        System.out.println(car);
-                    }
+                    System.out.println("🚗 Available Cars:");
+                    carService.getAvailableCars().forEach(System.out::println);
                     break;
 
                 case 4:
                     System.out.print("Enter car ID: ");
-                    int rentCarId = scanner.nextInt();
+                    int rentCarId = Integer.parseInt(scanner.nextLine());
                     System.out.print("Enter customer ID: ");
-                    int custId = scanner.nextInt();
+                    int custId = Integer.parseInt(scanner.nextLine());
+
                     Car carToRent = carService.getCarById(rentCarId);
                     Customer rentingCustomer = customerService.getCustomerById(custId);
+
                     if (carToRent != null && rentingCustomer != null) {
                         rentalService.rentCar(carToRent, rentingCustomer);
                     } else {
-                        System.out.println("Invalid car or customer ID.");
+                        System.out.println("❌ Invalid car or customer ID.");
                     }
                     break;
 
                 case 5:
                     System.out.print("Enter car ID to return: ");
-                    int returnCarId = scanner.nextInt();
+                    int returnCarId = Integer.parseInt(scanner.nextLine());
                     Car carToReturn = carService.getCarById(returnCarId);
+
                     if (carToReturn != null && !carToReturn.isAvailable()) {
                         rentalService.returnCar(carToReturn);
                     } else {
-                        System.out.println("Invalid car ID or car is already available.");
+                        System.out.println("❌ Invalid car ID or car is already available.");
                     }
                     break;
 
                 case 6:
-                    System.out.println("Rental History:");
-                    rentalService.getAllRentals().forEach(System.out::println);
+                    System.out.println("📜 Rental History:");
+                    rentalService.printAllRentalRecords();
                     break;
 
                 case 0:
-                    System.out.println("Thank you for using Rent-Car Management System.");
+                    System.out.println("👋 Thank you for using Rent-Car Management System.");
                     return;
 
                 default:
-                    System.out.println("Invalid option.");
+                    System.out.println("❌ Invalid option.");
             }
         }
     }
